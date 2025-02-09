@@ -1,8 +1,11 @@
+#include <iostream>
 #include <string>
 #include <sstream>
+
 #include "WS_WIFI.h"
 #include "ota.h"
 #include "rs485.h" // for temp/humidity fetch
+#include "version.h"
 
 const char *ssid = STASSID;                   // Name of the WIFI you want to connect to
 const char *password = STAPSK;                // The WIFI password to connect to
@@ -12,12 +15,16 @@ char ipStr[16];
 bool WIFI_Connection = 0;
 
 void handleRoot() {
+  // toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5 is too old to support C++20 :'(
+  //String version = std::format("v{}.{:03}", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR);
+  char version[32];
+  sprintf(version, "v%d.%03d", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR);
   String myhtmlPage =
     String("") +
     "<html>"+
     "<head>"+
     "    <meta charset=\"utf-8\">"+
-    "    <title>Attic Fan Controller</title>"+
+    "    <title>Attic Fan Controller " + version + "</title>" +
     "    <style>" +
     "        body {" +
     "            font-family: Arial, sans-serif;" +
@@ -156,7 +163,7 @@ void handleRoot() {
     "</head>"+
     "<body>"+
     "    <div class=\"header\">"+
-    "        <h1>Attic Fan Controller</h1>"+
+    "        <h1>Attic Fan Controller " + version + "</h1>"+
     "    </div>"+
     "    <div class=\"container\">"+
     "        <div class=\"input-container\" style=\"margin-left: 82px;\">"+
