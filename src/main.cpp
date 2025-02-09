@@ -3,8 +3,6 @@
 #include "WS_WIFI.h"
 #include "WS_Bluetooth.h"
 #include "WS_GPIO.h"
-#include "WS_Serial.h"
-#include "WS_RTC.h"
 
 #define CH1 '1'                 // CH1 Enabled Instruction
 #define CH2 '2'                 // CH2 Enabled Instruction
@@ -15,7 +13,6 @@
 #define ALL_ON  '7'             // Start all channel instructions
 #define ALL_OFF '8'             // Disable all channel instructions
 
-#define RS485_Mode        1     // Used to distinguish data sources
 #define Bluetooth_Mode    2
 #define WIFI_Mode         3
 
@@ -122,29 +119,16 @@ void Relay_Analysis(uint8_t *buf,uint8_t Mode_Flag)
 
 /********************************************************  Initializing  ********************************************************/
 void setup() {
-    Serial_Init();
     GPIO_Init(); // for relays, RGB LED, and Buzzer
-
-    if (RTC_Enable)
-    {
-        RTC_Init();
-    }
 
     Bluetooth_Init();
 
     if (WIFI_Enable == 1)
         WIFI_Init();
-    // Obtain and synchronize network time
-    if (WIFI_Connection == 1 && RTC_Enable == 1){
-        Acquisition_time();
-    }
 }
 
 /**********************************************************  While  **********************************************************/
 void loop() {
-    // RS485 Receive Data
-    Serial_Loop();
-
     // Bluetooth Receive Data
     // The operation after receiving the data is processed in Bluetooth.C
 
@@ -152,7 +136,6 @@ void loop() {
     if (WIFI_Enable == 1)
         WIFI_Loop();
 
-    Simulated_time++;
     // Send Wi-Fi IP via Bluetooth
     if (WIFI_Connection == 1){
         if(Simulated_time == 1000){
@@ -160,13 +143,6 @@ void loop() {
         }
     }
 
-    // RTC
-    if (RTC_Enable)
-    {
-        if (Simulated_time ==1000){
-            RTC_Loop();
-        }
-    }
-    if (Simulated_time == 1000)
+    if (++Simulated_time > 1000)
         Simulated_time = 0;
 }
