@@ -9,6 +9,11 @@ It is designed to operate in one of the following modes:
 
 A web interface allows control and monitoring.
 
+## Configuration
+
+In order for this project to compile you'll need to create a `project_config.h` file at the root.
+You can duplicate the `project_config_template.h`, rename it, and customize it for this purpose.
+
 ## Hardware
 
 * [Waveshare ESP32-S3-Relay-6CH](https://www.waveshare.com/wiki/ESP32-S3-Relay-6CH)

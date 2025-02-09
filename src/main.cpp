@@ -29,12 +29,12 @@ uint32_t Simulated_time=0;      // Analog time counting
 /********************************************************  Data Analysis  ********************************************************/
 void Relay_Analysis(uint8_t *buf,uint8_t Mode_Flag)
 {
-    if(Mode_Flag == Bluetooth_Mode)
+    if (Mode_Flag == Bluetooth_Mode)
         printf("Bluetooth Data :");
-    else if(Mode_Flag == WIFI_Mode)
-        printf("WIFI Data :");
+    else if (Mode_Flag == WIFI_Mode)
+        printf ("WIFI Data :");
     else
-        printf("RS485 Data :");
+        printf ("RS485 Data :");
     switch(buf[0])
     {
         case CH1:
@@ -122,58 +122,51 @@ void Relay_Analysis(uint8_t *buf,uint8_t Mode_Flag)
 
 /********************************************************  Initializing  ********************************************************/
 void setup() {
-// UART
     Serial_Init();
+    GPIO_Init(); // for relays, RGB LED, and Buzzer
 
-// Relay . RGB . Buzzer GPIO
-    GPIO_Init();
-
-// RTC
-    if(RTC_Enable)
+    if (RTC_Enable)
     {
         RTC_Init();
     }
 
-// Bluetooth
     Bluetooth_Init();
 
-// WIFI
-    if(WIFI_Enable == 1)      // WIFI connection successful
+    if (WIFI_Enable == 1)
         WIFI_Init();
-
-// Obtain and synchronize network time
-    if(WIFI_Connection == 1 && RTC_Enable == 1){
+    // Obtain and synchronize network time
+    if (WIFI_Connection == 1 && RTC_Enable == 1){
         Acquisition_time();
     }
 }
 
 /**********************************************************  While  **********************************************************/
 void loop() {
-// RS485 Receive Data
+    // RS485 Receive Data
     Serial_Loop();
 
-// Bluetooth Receive Data
+    // Bluetooth Receive Data
     // The operation after receiving the data is processed in Bluetooth.C
 
-// WIFI
-    if(WIFI_Enable == 1)
+    // Wi-Fi
+    if (WIFI_Enable == 1)
         WIFI_Loop();
 
     Simulated_time++;
-// Send WIFI IP via Bluetooth
-    if(WIFI_Connection == 1){
+    // Send Wi-Fi IP via Bluetooth
+    if (WIFI_Connection == 1){
         if(Simulated_time == 1000){
             Bluetooth_SendData(ipStr);        // The IP address that sends WIFI
         }
     }
-// RTC
-    if(RTC_Enable)
+
+    // RTC
+    if (RTC_Enable)
     {
-        if(Simulated_time ==1000){
+        if (Simulated_time ==1000){
             RTC_Loop();
         }
     }
-    if(Simulated_time ==1000)
+    if (Simulated_time == 1000)
         Simulated_time = 0;
-
 }
