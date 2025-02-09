@@ -4,6 +4,7 @@
 #include "WS_GPIO.h"
 #include "WS_WIFI.h"
 #include "rs485.h"
+#include "version.h"
 
 #define CH1 '1'                 // CH1 Enabled Instruction
 #define CH2 '2'                 // CH2 Enabled Instruction
@@ -121,7 +122,7 @@ void Relay_Analysis(uint8_t *buf,uint8_t Mode_Flag)
 /********************************************************  Initializing  ********************************************************/
 void setup() {
     Serial.begin(115200); // should agree with monitor_speed in platformio.ini
-
+    printf("Attic Fan Controller v%d.%03d\r\n", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR);
     GPIO_Init(); // for relays, RGB LED, and Buzzer
 
     rs485_init();
