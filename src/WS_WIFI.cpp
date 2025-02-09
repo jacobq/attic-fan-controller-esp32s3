@@ -1,6 +1,7 @@
 #include <string>
 #include <sstream>
 #include "WS_WIFI.h"
+#include "ota.h"
 #include "rs485.h" // for temp/humidity fetch
 
 const char *ssid = STASSID;                   // Name of the WIFI you want to connect to
@@ -298,6 +299,8 @@ void WIFI_Init()
     server.on("/AllOn"  , handleSwitch7);
     server.on("/AllOff" , handleSwitch8);
 
+    ota_init(server);
+
     server.begin(); //启动服务器
     printf("Web server started\r\n");
   }
@@ -310,6 +313,7 @@ void WIFI_Init()
 
 void WIFI_Loop()
 {
+  ota_task();
   if(WIFI_Connection == 1)
     server.handleClient();                        // Processing requests from clients
 }
