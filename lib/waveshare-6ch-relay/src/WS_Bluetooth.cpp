@@ -1,5 +1,9 @@
 #include "WS_Bluetooth.h"
 
+#ifndef Extension_Enable
+#define Extension_Enable 0
+#endif
+
 BLEServer* pServer;                                                             // Used to represent a BLE server
 BLECharacteristic* pTxCharacteristic;
 BLECharacteristic* pRxCharacteristic;
@@ -37,17 +41,18 @@ class MyRXCallback : public BLECharacteristicCallbacks {
       }
       else if(rxValue.length() == 2)
       {
-        if(Extension_Enable)
-        {
-          printf("%s\n", rxValue.c_str());                                      // Print output through the serial port       
+        #if Extension_Enable == 1
+          printf("%s\n", rxValue.c_str());                                      // Print output through the serial port
           uint8_t* valueBytes = reinterpret_cast<uint8_t*>(const_cast<char*>(rxValue.c_str())); // Convert value to uint8 t*
           if(valueBytes[0] == 0x06)                                             // Instruction check correct
-            RS485_Analysis(valueBytes);                                         // Control external relay
+          {
+              RS485_Analysis(valueBytes);                                         // Control external relay
+          }
           else
             printf("Note : Non-instruction data was received - Bluetooth !\r\n");
-        }
-        else
-          printf("Note : Non-instruction data was received - Bluetooth !\r\n");
+        #else
+          printf("Note : Non-instruction data was received (RS485 extension disabled) - Bluetooth !\r\n");
+        #endif
       }
       else
       {

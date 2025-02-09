@@ -4,7 +4,6 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include "WS_GPIO.h"
-#include "WS_Serial.h"
 #include "WS_Information.h"
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"                     // UUID of the server
