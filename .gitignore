@@ -3,3 +3,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+# Sensitive, environment-specific options, e.g., Wi-Fi password, should not be commited to the repository
+project_config.h
