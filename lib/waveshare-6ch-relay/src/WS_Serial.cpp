@@ -1,7 +1,7 @@
 #include "WS_Serial.h"
 #include <algorithm>
 
-HardwareSerial lidarSerial(1);  // Using serial port 1
+HardwareSerial rs485Serial(1);  // Using serial port 1
 uint8_t data[][8] = {                                       // ESP32-S3-Relay-6CH Control Command (RS485 receiving data)
   { 0x06, 0x05, 0x00, 0x01, 0x55, 0x00, 0xA2, 0xED },       // ESP32-S3-Relay-6CH CH1 Toggle
   { 0x06, 0x05, 0x00, 0x02, 0x55, 0x00, 0x52, 0xED },       // ESP32-S3-Relay-6CH CH2 Toggle
@@ -27,13 +27,13 @@ uint8_t Send_Data[][8] = {                                  // Modbus RTU Relay 
 uint8_t buf[20] = {0};          // Data storage area
 
 void SetData(uint8_t* data, size_t length) {
-  lidarSerial.write(data, length);                          // Send data from the RS485
+  rs485Serial.write(data, length);                          // Send data from the RS485
 }
 void ReadData(uint8_t* buf, uint8_t length) {
   uint8_t Receive_Flag = 0;       
-  Receive_Flag = lidarSerial.available();
+  Receive_Flag = rs485Serial.available();
   if (Receive_Flag >= length) {
-    lidarSerial.readBytes(buf, length); 
+    rs485Serial.readBytes(buf, length);
     char printBuf[length * 3 + 1];
     sprintf(printBuf, "Received data: ");
     for (int i = 0; i < length; i++) {
@@ -98,15 +98,15 @@ void RS485_Analysis(uint8_t *buf)
 void Serial_Init()
 {
   // Serial.begin(115200);                                  // Initializing serial port
-  lidarSerial.begin(115200, SERIAL_8N1, RXD1, TXD1);        // Initializing serial port
+  rs485Serial.begin(115200, SERIAL_8N1, RXD1, TXD1);        // Initializing serial port
 }
 
 void Serial_Loop()
 {
   uint8_t Receive_Flag = 0;       // Receiving mark
-  Receive_Flag = lidarSerial.available();
+  Receive_Flag = rs485Serial.available();
   if (Receive_Flag > 0) {
-    lidarSerial.readBytes(buf, Receive_Flag);              // The Receive_Flag length is read
+    rs485Serial.readBytes(buf, Receive_Flag);              // The Receive_Flag length is read
     if(Receive_Flag == 8){
       uint8_t i=0;
       for(i=0;i<8;i++){
