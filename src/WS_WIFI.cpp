@@ -1,4 +1,7 @@
+#include <string>
+#include <sstream>
 #include "WS_WIFI.h"
+#include "rs485.h" // for temp/humidity fetch
 
 const char *ssid = STASSID;                   // Name of the WIFI you want to connect to
 const char *password = STAPSK;                // The WIFI password to connect to
@@ -13,7 +16,7 @@ void handleRoot() {
     "<html>"+
     "<head>"+
     "    <meta charset=\"utf-8\">"+
-    "    <title>ESP32 S3 Relay 6CH</title>"+
+    "    <title>Attic Fan Controller</title>"+
     "    <style>" +
     "        body {" +
     "            font-family: Arial, sans-serif;" +
@@ -110,7 +113,11 @@ void handleRoot() {
     // "            displayErrorTextBox(false);"+
     "            xhr.onreadystatechange = function() {"+
     "              if (xhr.readyState === 4 && xhr.status === 200) {"+
-    "                var dataArray = JSON.parse(xhr.responseText);"+
+    "                var jsonResponseData = JSON.parse(xhr.responseText);"+
+    "                console.log(jsonResponseData);"+
+    "                document.getElementById('degC_reading').value = jsonResponseData.degCx10 / 10;"+
+    "                document.getElementById('rh_reading').value = jsonResponseData.rhx10 / 10;"+
+    "                var dataArray = jsonResponseData.relays;"+
     "                document.getElementById('ch1').value = dataArray[0];"+
     "                document.getElementById('ch2').value = dataArray[1];"+
     "                document.getElementById('ch3').value = dataArray[2];"+
@@ -148,9 +155,19 @@ void handleRoot() {
     "</head>"+
     "<body>"+
     "    <div class=\"header\">"+
-    "        <h1>ESP32-S3-Relay-6CH</h1>"+
+    "        <h1>Attic Fan Controller</h1>"+
     "    </div>"+
     "    <div class=\"container\">"+
+    "        <div class=\"input-container\" style=\"margin-left: 82px;\">"+
+    "            <label for=\"degC_reading\">Temperature</label>"+
+    "            <input type=\"text\" id=\"degC_reading\" disabled />"+
+    "            <span>°C</span>"+
+    "        </div>"+
+    "        <div class=\"input-container\" style=\"margin-left: 50px;\">"+
+    "            <label for=\"rh_reading\">Relative humidity</label>"+
+    "            <input type=\"text\" id=\"rh_reading\" disabled />"+
+    "            <span>%</span>"+
+    "        </div>"+
     "        <div class=\"input-container\" style=\"margin-left: 140px;\">"+
     "            <label for=\"input1\">CH1</label>"+
     "            <input type=\"text\" id=\"ch1\" />"+
@@ -196,16 +213,22 @@ void handleRoot() {
   server.send(200, "text/html", myhtmlPage); 
   printf("The user visited the home page\r\n");
 }
+
 void handleGetData() {
-  String json = "[";
-  for (int i = 0; i < sizeof(Relay_Flag) / sizeof(Relay_Flag[0]); i++) {
-    json += String(Relay_Flag[i]);
-    if (i < sizeof(Relay_Flag) / sizeof(Relay_Flag[0]) - 1) {
-      json += ",";
+    std::stringstream json_ss;
+    json_ss << "{\n"
+       << "\t\"degCx10\": " << get_temperature_degC_x10() << ",\n"
+       << "\t\"rhx10\": " << get_relative_humidity_percent_x10() << ",\n"
+       << "\t\"relays\": ["
+    ;
+    for (int i = 0; i < sizeof(Relay_Flag) / sizeof(Relay_Flag[0]); i++) {
+        json_ss << (Relay_Flag[i] ? '1' : '0');
+        if (i < sizeof(Relay_Flag) / sizeof(Relay_Flag[0]) - 1) {
+            json_ss << ",";
+        }
     }
-  }
-  json += "]";
-  server.send(200, "application/json", json);
+    json_ss << "]\n}";
+    server.send(200, "application/json", json_ss.str().c_str());
 }
 void handleSwitch(int ledNumber) {
   uint8_t Data[1]={0};
