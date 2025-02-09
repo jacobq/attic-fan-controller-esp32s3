@@ -43,7 +43,7 @@ static sensor_context context =
     .inputRegs = { 0 },
     .relative_humidity_percent_x10 = 0,
     .temperature_degC_x10 = 0,
-    .milliseconds_to_delay_between_readings = 1000,
+    .milliseconds_to_delay_between_readings = 250,
 };
 
 bool time_delay_done(void *arg)
@@ -99,7 +99,7 @@ void rs485_task()
             //printf("Requesting temperature & humidity readings\r\n");
             mb.readIreg(context.slave_id, 1, context.inputRegs, 2, cb);
             context.mb_state = WAITING_FOR_RESPONSE;
-            modbus_timeout_task = modbus_timeout_timer.in(1000, timeout_while_reading_modbus, &context);
+            modbus_timeout_task = modbus_timeout_timer.in(2000, timeout_while_reading_modbus, &context);
             break;
         case WAITING_FOR_RESPONSE:
             break;
