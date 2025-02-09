@@ -1,0 +1,15 @@
+# Attic Fan Controller
+
+This program measures humidity and temperature then decides whether or not the relay-controlled fans should be on or off.
+
+It is designed to operate in one of the following modes:
+
+- **Humidstat**: (default) when relative humidity is higher than a specified activation threshold the fans will be switched on until it falls below a specified deactivation threshold.
+- **Manual**: each relay/channel is set to on or off and that value is maintained until changed.
+
+A web interface allows control and monitoring.
+
+## Hardware
+
+* [Waveshare ESP32-S3-Relay-6CH](https://www.waveshare.com/wiki/ESP32-S3-Relay-6CH)
+* [HiLetgo RS485 SHT20 Temperature Humidity Sensor Module](https://www.amazon.com/dp/B082F8WXD8) (uses [Sensirion SHT20](https://sensirion.com/media/documents/CCDE1377/635000A2/Sensirion_Datasheet_Humidity_Sensor_SHT20.pdf) internally)
