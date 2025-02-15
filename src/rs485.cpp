@@ -110,7 +110,7 @@ void rs485_task()
 
 void update_temperature_and_humidity(struct sensor_context *c)
 {
-    c->temperature_degC_x10 = c->inputRegs[0];
+    c->temperature_degC_x10 = (int16_t)c->inputRegs[0];
     c->relative_humidity_percent_x10 = c->inputRegs[1];
     //printf("Updated temperature & humidity %d %d\r\n", c->temperature_degC_x10, c->relative_humidity_percent_x10);
 }
